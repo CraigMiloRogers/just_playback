@@ -204,7 +204,7 @@ typedef struct
 {
     /* Basic info. This is the only information guaranteed to be filled in during device enumeration. */
     ma_device_id id;
-    char name[256];   /* MA_MAX_DEVICE_NAME_LENGTH +1 for null terminator. */
+    char name[/* MA_MAX_DEVICE_NAME_LENGTH +1*/ 256];   /* +1 for null terminator. */
     ma_bool32 isDefault;
 
     ma_uint32 nativeDataFormatCount;
