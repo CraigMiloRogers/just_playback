@@ -183,3 +183,11 @@ ma_result get_device_volume(Attrs* attrs)
 
     return ma_res;
 }
+
+void set_playback_device(Attrs* attrs, int idx)
+{
+    if (idx >= 0 && idx < attrs->num_playback_devices)
+    {
+        attrs->deviceConfig.playback.pDeviceId = &(attrs->pPlaybackInfos[idx].id)
+    }
+}
