@@ -34,7 +34,7 @@ class Playback:
             if path_to_file:
                 self.load_file(path_to_file)   
     
-       def load_file(self, path_to_file: str) -> None:
+    def load_file(self, path_to_file: str) -> None:
         """
             Loads an audio file using one of the available backends.
             This also kills any active playback
