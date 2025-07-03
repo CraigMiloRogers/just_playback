@@ -247,6 +247,13 @@ class Playback:
         return [self.get_device_name(idx) for idx in range(self.__ma_attrs.num_playback_devices)]
 
     def set_playback_device(self, idx) -> None:
+        """
+            Set the current playback device, using the index of the playbasck device in
+            the list of playback devices that we axquired during initialization.
+
+            TODO: save the current playback device index.
+            TODO: save the current playback device name.
+        """
         if idx < 0:
             raise MiniaudioError('Cannot set the playback device to a negative index %d' % idx)
 
