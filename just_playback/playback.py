@@ -239,7 +239,7 @@ class Playback:
 
     # idx must be >= 0 and < num_playback_devices
     def get_device_name(self, idx):
-        return ffi.string(self.__ma_attrs.pPlaybackInfos[idx]).decode('utf-8')
+        return ffi.string(self.__ma_attrs.pPlaybackInfos[idx].name).decode('utf-8')
             
 
     @property
