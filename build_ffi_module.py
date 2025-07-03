@@ -59,6 +59,7 @@ ffibuilder.cdef( ma_defs + '\n\n'
                     void audio_stream_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
                     ma_result set_device_volume(Attrs* attrs);
                     ma_result get_device_volume(Attrs* attrs);
+                    void set_playback_device(Attrs* attrs, int idx);
                 """)
 
 ffibuilder.set_source("_ma_playback",  
