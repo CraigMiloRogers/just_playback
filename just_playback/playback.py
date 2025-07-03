@@ -239,7 +239,7 @@ class Playback:
 
     @property
     def playback_devices(self) -> List[str]:
-        return [self.ma_attrs.pPlaybackInfos[idx] for idx in range(self.__ma_attrs.num_playback_devices)]
+        return [self.__ma_attrs.pPlaybackInfos[idx] for idx in range(self.__ma_attrs.num_playback_devices)]
 
     def __bind(self, ma_res: int) -> None:
         """ 
