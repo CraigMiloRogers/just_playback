@@ -237,9 +237,14 @@ class Playback:
         """
         return self.__ma_attrs.num_playback_devices
 
+    # idx must be >= 0 and < num_playback_devices
+    def get_device_name(self, idx):
+        return ffi.string(self.__ma_attrs.pPlaybackInfos[idx]).decode('utf-8')
+            
+
     @property
     def playback_devices(self) -> List[str]:
-        return [self.__ma_attrs.pPlaybackInfos[idx] for idx in range(self.__ma_attrs.num_playback_devices)]
+        return [self.get_device_name(idx) for idx in range(self.__ma_attrs.num_playback_devices)]
 
     def __bind(self, ma_res: int) -> None:
         """ 
