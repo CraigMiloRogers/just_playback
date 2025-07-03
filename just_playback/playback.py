@@ -3,7 +3,7 @@ import math
 import platform
 import logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-from typing import Optional, Any
+from typing import Optional, Any, List
 
 from tinytag import TinyTag
 from _ma_playback import ffi, lib
@@ -34,19 +34,7 @@ class Playback:
             if path_to_file:
                 self.load_file(path_to_file)   
     
-   
-    # idx must be >= 0 and < num_playback_devices
-    def get_device_name(self, idx):
-        if idx < 0 :
-            raise MiniaudioError('Device index %d cannot be negative' % idx)
-
-        if idx >= self.__ma_attrs.num_playback_devices:
-            raise MiniaudioError('Device index %d exceeds maximim %d' % (idx, self.__ma_attrs.num_playback_devices - 1))
-
-        return self.ma_attrs.pPlaybackInfos[idx]
-            
-
-    def load_file(self, path_to_file: str) -> None:
+       def load_file(self, path_to_file: str) -> None:
         """
             Loads an audio file using one of the available backends.
             This also kills any active playback
@@ -248,6 +236,10 @@ class Playback:
             Returns the number of playback devices reported by miniaudio.
         """
         return self.__ma_attrs.num_playback_devices
+
+    @property
+    def playback_devices(self) -> List[str]:
+        return [self.ma_attrs.pPlaybackInfos[idx] for idx in 0..self.__ma_attrs.num_playback_devices]
 
     def __bind(self, ma_res: int) -> None:
         """ 
