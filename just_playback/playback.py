@@ -250,7 +250,7 @@ class Playback:
         if idx < 0:
             raise MiniaudioError('Cannot set the playback device to a negative index %d' % idx)
 
-        num_playback_devices self.__ma_attrs.num_playback_devices
+        num_playback_devices = self.__ma_attrs.num_playback_devices
         if idx >= num_playback_devices:
             raise MiniaudioError('Requested playback device %d >= %d' (idx, num_playback_devices))
 
