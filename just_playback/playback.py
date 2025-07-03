@@ -242,6 +242,13 @@ class Playback:
     def loops_at_end(self) -> bool:
         return self.__ma_attrs.loops_at_end
 
+    @property
+    def num_playback_devices(self) -> int:
+        """
+            Returns the number of playback devices reported by miniaudio.
+        """
+        return self.__ma_attrs.num_playback_devices
+
     def __bind(self, ma_res: int) -> None:
         """ 
             Internal method for checking and throwing possible miniaudio errors. 
@@ -253,4 +260,3 @@ class Playback:
 
     def __del__(self):
         self.__bind(lib.terminate_audio_stream(self.__ma_attrs))
-
