@@ -200,6 +200,25 @@ struct ma_device
     ...;
 };
 
+typedef struct
+{
+    /* Basic info. This is the only information guaranteed to be filled in during device enumeration. */
+    ma_device_id id;
+    char name[256];   /* MA_MAX_DEVICE_NAME_LENGTH +1 for null terminator. */
+    ma_bool32 isDefault;
+
+    ma_uint32 nativeDataFormatCount;
+    struct
+    {
+        ma_format format;       /* Sample format. If set to ma_format_unknown, all sample formats are supported. */
+        ma_uint32 channels;     /* If set to 0, all channels are supported. */
+        ma_uint32 sampleRate;   /* If set to 0, all sample rates are supported. */
+        ma_uint32 flags;        /* A combination of MA_DATA_FORMAT_FLAG_* flags. */
+    } nativeDataFormats[/*ma_format_count * ma_standard_sample_rate_count * MA_MAX_CHANNELS*/ 64];  /* Not sure how big to make this. There can be *many* permutatio\
+ns for virtual devices which can support anything. */
+} ma_device_info;
+
+
 struct ma_device_config
 {
     ma_device_type deviceType;

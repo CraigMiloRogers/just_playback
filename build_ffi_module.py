@@ -29,6 +29,7 @@ if platform.system() != "Darwin":
 ffibuilder.cdef( ma_defs + '\n\n'
                 """ 
                     typedef struct {  
+                        ma_device_info* pPlaybackInfos;
                         ma_uint32 num_playback_devices;
 
                         ma_decoder decoder;
