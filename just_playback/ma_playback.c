@@ -21,6 +21,7 @@ ma_result check_available_playback_devices(Attrs* attrs)
         
         ma_res = ma_context_get_devices(&context, &pPlaybackInfos, &playbackCount, &pCaptureInfos, &captureCount);
         attrs->num_playback_devices = playbackCount;
+	attrs->pPlaybackInfos = pPlaybackInfos;
 
         return ma_res;
     }

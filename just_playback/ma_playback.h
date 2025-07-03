@@ -10,6 +10,7 @@
 typedef struct 
 {
     ma_uint32 num_playback_devices;
+    ma_device_info* pPlaybackInfos;
 
     ma_decoder decoder;
     ma_device_config deviceConfig;
