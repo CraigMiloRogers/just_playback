@@ -246,6 +246,15 @@ class Playback:
     def playback_devices(self) -> List[str]:
         return [self.get_device_name(idx) for idx in range(self.__ma_attrs.num_playback_devices)]
 
+    def set_playback_device(self, idx) -> None:
+        if idx < 0:
+            raise MiniaudioError('Cannot set the playback device to a negative index %d' % idx)
+
+        if idx >= self.__ma_attrs.num_playback_devices:
+            raise MiniaudioError('Requested playback device %d >= %d' (idx, self.__ma_attrs.num_playback_devices))
+
+        self.__ma_attrs.playback.deviceConfig.playback.pDeviceID = &self.__ma_attrs.pPlaybackInfos[idx]
+
     def __bind(self, ma_res: int) -> None:
         """ 
             Internal method for checking and throwing possible miniaudio errors. 
