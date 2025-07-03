@@ -188,6 +188,6 @@ void set_playback_device(Attrs* attrs, int idx)
 {
     if (idx >= 0 && idx < attrs->num_playback_devices)
     {
-        attrs->deviceConfig.playback.pDeviceId = &(attrs->pPlaybackInfos[idx].id)
+      attrs->deviceConfig.playback.pDeviceId = &(attrs->pPlaybackInfos[idx].id);
     }
 }
