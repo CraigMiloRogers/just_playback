@@ -252,7 +252,7 @@ class Playback:
 
         num_playback_devices = self.__ma_attrs.num_playback_devices
         if idx >= num_playback_devices:
-            raise MiniaudioError('Requested playback device %d >= %d' (idx, num_playback_devices))
+            raise MiniaudioError('Requested playback device %d >= %d' % (idx, num_playback_devices))
 
         self.__ma_attrs.playback.deviceConfig.playback.pDeviceID = self.__ma_attrs.pPlaybackInfos[idx]
 
