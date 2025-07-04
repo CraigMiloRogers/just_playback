@@ -18893,8 +18893,6 @@ static void ma_device__handle_data_callback(ma_device* pDevice, void* pFramesOut
         masterVolumeFactor = masterVolumeFactorLimit;
 	/* TODO: if masterVolumeFactor > 1 here, we ought to apply clipping below. */
     }
-    printf(".");
-
 
     if (pDevice->onData) {
         unsigned int prevDenormalState = ma_device_disable_denormals(pDevice);
