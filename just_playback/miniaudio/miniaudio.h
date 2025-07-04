@@ -18893,7 +18893,7 @@ static void ma_device__handle_data_callback(ma_device* pDevice, void* pFramesOut
         masterVolumeFactor = masterVolumeFactorLimit;
 	/* TODO: if masterVolumeFactor > 1 here, we ought to apply clipping below. */
     }
-    print(".")
+    print(".");
 
 
     if (pDevice->onData) {
