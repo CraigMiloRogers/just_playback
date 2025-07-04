@@ -142,13 +142,29 @@ class Playback:
             Sets the volume for the playback device. Persists
             across audio file loads until reset
 
+            A value < 1 will decrease the volume of the audio strean; 0 is silence.
+            A value > 1, when permitted by the volume limit, will increase the volume of the audio stream, at the risk of distortion.
+
         Args:
-            volume: A value in the interval [0, 1].
+            volume: A value in the interval [0, volume limit].
         """
 
-        self.__ma_attrs.playback_volume = min(max(volume, 0), 1)
+        self.__ma_attrs.playback_volume = max(volume, 0)
         if self.active:
             self.__bind(lib.set_device_volume(self.__ma_attrs))
+    
+    def set_volume_limit(self, volume_limit: float) -> None:
+        """
+            Sets the volume limit for the playback device. Persists
+            across audio file loads until reset
+
+        Args:
+            volume_limit: A value >= 0
+        """
+
+        self.__ma_attrs.playback_volume_limit = max(volume_limit, 0)
+        if self.active:
+            self.__bind(lib.set_device_volume_limit(self.__ma_attrs))
     
     def loop_at_end(self, loops_at_end: bool) -> None:
         """
@@ -218,13 +234,24 @@ class Playback:
     @property
     def volume(self) -> float:
         """
-            The playback's current volume, a value in the interval [0, 1]
+            The playback's current volume, a value in the interval [0, volumeLimit]
         """
 
         if self.active:
             self.__bind(lib.get_device_volume(self.__ma_attrs))
         
         return self.__ma_attrs.playback_volume
+    
+    @property
+    def volumeLimit(self) -> float:
+        """
+            The playback's current volume limit, a value >= 0
+        """
+
+        if self.active:
+            self.__bind(lib.get_device_volume_limit(self.__ma_attrs))
+        
+        return self.__ma_attrs.playback_volume_limit
     
     @property
     def loops_at_end(self) -> bool:

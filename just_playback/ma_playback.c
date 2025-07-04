@@ -37,6 +37,7 @@ void init_attrs(Attrs* attrs)
     attrs->frame_offset                  = 0;
 
     attrs->playback_volume               = 1.0;
+    attrs->playback_volume_limit         = 1.0;
     attrs->loops_at_end                  = false;
 
     attrs->frame_offset_modified         = false;
@@ -180,6 +181,23 @@ ma_result get_device_volume(Attrs* attrs)
     float volume;
     ma_result ma_res = ma_device_get_master_volume(&(attrs->device), &volume);
     attrs->playback_volume = volume;
+
+    return ma_res;
+}
+
+ma_result set_device_volume_limit(Attrs* attrs) 
+{
+    ma_result ma_res = ma_device_set_master_volume_limit(&(attrs->device), attrs->playback_volume_limit);
+    
+    return ma_res;
+}
+
+
+ma_result get_device_volume_limit(Attrs* attrs)
+{
+    float volumeLimit;
+    ma_result ma_res = ma_device_get_master_volume_limit(&(attrs->device), &volumeLimit);
+    attrs->playback_volume_limit = volumeLimit;
 
     return ma_res;
 }
