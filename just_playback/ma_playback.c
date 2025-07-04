@@ -208,5 +208,5 @@ void set_playback_device(Attrs* attrs, int idx)
     {
       attrs->deviceConfig.playback.pDeviceID = &(attrs->pPlaybackInfos[idx].id);
     }
-    # Would we want to throw an error if the index is out of bounds?
+    /* Would we want to throw an error if the index is out of bounds? */
 }
