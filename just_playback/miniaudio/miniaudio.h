@@ -18890,7 +18890,7 @@ static void ma_device__handle_data_callback(ma_device* pDevice, void* pFramesOut
     ma_device_get_master_volume_limit(pDevice, &masterVolumeFactorLimit);  /* Use ma_device_get_master_volume_limit() to ensure the volume limit is loaded atomically. */
 
     if (masterVolumeFactor > masterVolumeFactorLimit) {
-      masterVolumeFactor = masterVolumeFactorLimit
+        masterVolumeFactor = masterVolumeFactorLimit;
 	/* TODO: if masterVolumeFactor > 1 here, we ought to apply clipping below. */
     }
 
@@ -42603,7 +42603,7 @@ MA_API ma_result ma_device_set_master_volume_limit(ma_device* pDevice, float vol
         return MA_INVALID_ARGS;
     }
 
-    if (volume < 0.0f) {
+    if (volumeLimit < 0.0f) {
         return MA_INVALID_ARGS;
     }
 
@@ -42619,7 +42619,7 @@ MA_API ma_result ma_device_get_master_volume_limit(ma_device* pDevice, float* pV
     }
 
     if (pDevice == NULL) {
-        *pVolume = 0;
+        *pVolumeLimit = 0;
         return MA_INVALID_ARGS;
     }
 
