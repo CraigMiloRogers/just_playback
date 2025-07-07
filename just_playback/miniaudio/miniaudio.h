@@ -7727,6 +7727,7 @@ struct ma_device
     ma_bool8 noDisableDenormals;
     ma_bool8 noFixedSizedCallback;
     ma_atomic_float masterVolumeFactor;         /* Linear 0..1. Can be read and written simultaneously by different threads. Must be used atomically. */
+    ma_atomic_float masterVolumeFactorLimit;    /* Overrides the uppe rlimit on the master volume factor. Can be read and written simultaneously by different threads. Must be used atomically. */
     ma_duplex_rb duplexRB;                      /* Intermediary buffer for duplex device on asynchronous backends. */
     struct
     {
