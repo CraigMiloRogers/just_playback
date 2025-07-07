@@ -58,6 +58,7 @@ class Playback:
 
         self.__bind(lib.init_audio_stream(self.__ma_attrs))
         self.__bind(lib.set_device_volume(self.__ma_attrs))
+        self.__bind(lib.set_device_volume_limit(self.__ma_attrs))
 
         self.__file_duration = TinyTag.get(path_to_file).duration
 
