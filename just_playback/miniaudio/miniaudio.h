@@ -9290,9 +9290,11 @@ MA_API ma_result ma_device_post_init(ma_device* pDevice, ma_device_type deviceTy
 /*
 Sets the master volume factor for the device.
 
-The volume factor must be between 0 (silence) and 1 (full volume). Use `ma_device_set_master_volume_db()` to use decibel notation, where 0 is full volume and
-values less than 0 decreases the volume.
+The volume factor must be between 0 (silence) and the volume factor limit. Use `ma_device_set_master_volume_db()` to use decibel notation, where 0 is full volume and values less than 0 decreases the volume.
 
+Values greater than 1 (if allowed by the volume factor limit) will increase the volume of the audio stream. This may cause distortion when audio samples become too large.
+
+TODO: Apply clipping when the master volume factor exceeds 1 (and is allowed to do so by the master volume factor limit). This will reduce the distortion.
 
 Parameters
 ----------
@@ -9345,7 +9347,7 @@ pDevice (in)
     A pointer to the device whose volume factor is being retrieved.
 
 pVolume (in)
-    A pointer to the variable that will receive the volume factor. The returned value will be in the range of [0, 1].
+    A pointer to the variable that will receive the volume factor. The returned value will be in the range of [0, volume factor limit].
 
 
 Return Value
@@ -41800,6 +41802,7 @@ MA_API ma_result ma_device_init(ma_context* pContext, const ma_device_config* pC
     pDevice->noDisableDenormals          = pConfig->noDisableDenormals;
     pDevice->noFixedSizedCallback        = pConfig->noFixedSizedCallback;
     ma_atomic_float_set(&pDevice->masterVolumeFactor, 1);
+    ma_atomic_float_set(&pDevice->masterVolumeFactorLimit, 1);
 
     pDevice->type                        = pConfig->deviceType;
     pDevice->sampleRate                  = pConfig->sampleRate;
