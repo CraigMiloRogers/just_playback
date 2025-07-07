@@ -18888,6 +18888,11 @@ static void ma_device__handle_data_callback(ma_device* pDevice, void* pFramesOut
     ma_device_get_master_volume(pDevice, &masterVolumeFactor);  /* Use ma_device_get_master_volume() to ensure the volume is loaded atomically. */
     ma_device_get_master_volume_limit(pDevice, &masterVolumeFactorLimit);  /* Use ma_device_get_master_volume_limit() to ensure the volume limit is loaded atomically. */
 
+    if (masterVolumeFactor > masterVolumeFactorLimit) {
+        masterVolumeFactor = masterVolumeFactorLimit;
+	/* TODO: if masterVolumeFactor > 1 here, we ought to apply clipping below. */
+    }
+
     if (pDevice->onData) {
         unsigned int prevDenormalState = ma_device_disable_denormals(pDevice);
         {
