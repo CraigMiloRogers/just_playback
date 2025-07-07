@@ -187,8 +187,6 @@ ma_result get_device_volume(Attrs* attrs)
 
 ma_result set_device_volume_limit(Attrs* attrs) 
 {
-    printf("set_device_volume_limit to %f\n", attrs->playback_volume_limit);
-
     ma_result ma_res = ma_device_set_master_volume_limit(&(attrs->device), attrs->playback_volume_limit);
     
     return ma_res;

@@ -150,11 +150,8 @@ class Playback:
             volume: A value in the interval [0, volume limit].
         """
 
-        print("set_volume %f" % volume)
-
         self.__ma_attrs.playback_volume = max(volume, 0)
         if self.active:
-            print("set_volume: active")
             self.__bind(lib.set_device_volume(self.__ma_attrs))
     
     def set_volume_limit(self, volume_limit: float) -> None:
@@ -166,11 +163,8 @@ class Playback:
             volume_limit: A value >= 0
         """
 
-        print("set_volume_limit %f" % volume_limit)
-
         self.__ma_attrs.playback_volume_limit = max(volume_limit, 0)
         if self.active:
-            print("set_volume_limit: active")
             self.__bind(lib.set_device_volume_limit(self.__ma_attrs))
     
     def loop_at_end(self, loops_at_end: bool) -> None:

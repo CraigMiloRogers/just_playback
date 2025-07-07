@@ -42571,7 +42571,6 @@ MA_API ma_result ma_device_set_master_volume_limit(ma_device* pDevice, float vol
     if (volumeLimit < 0.0f) {
         return MA_INVALID_ARGS;
     }
-    printf("ma_device_set_master_volume_limit to %f\n", volumeLimit);
 
     ma_atomic_float_set(&pDevice->masterVolumeFactorLimit, volumeLimit);
 
