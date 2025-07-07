@@ -18883,8 +18883,10 @@ static void ma_device__on_data(ma_device* pDevice, void* pFramesOut, const void*
 static void ma_device__handle_data_callback(ma_device* pDevice, void* pFramesOut, const void* pFramesIn, ma_uint32 frameCount)
 {
     float masterVolumeFactor;
+    float masterVolumeFactorLimit;
 
     ma_device_get_master_volume(pDevice, &masterVolumeFactor);  /* Use ma_device_get_master_volume() to ensure the volume is loaded atomically. */
+    ma_device_get_master_volume_limit(pDevice, &masterVolumeFactorLimit);  /* Use ma_device_get_master_volume_limit() to ensure the volume limit is loaded atomically. */
 
     if (pDevice->onData) {
         unsigned int prevDenormalState = ma_device_disable_denormals(pDevice);
