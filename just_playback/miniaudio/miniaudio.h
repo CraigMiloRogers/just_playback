@@ -7727,7 +7727,6 @@ struct ma_device
     ma_bool8 noDisableDenormals;
     ma_bool8 noFixedSizedCallback;
     ma_atomic_float masterVolumeFactor;         /* Linear 0..1. Can be read and written simultaneously by different threads. Must be used atomically. */
-    ma_atomic_float masterVolumeFactorLimit;    /* Overrides the uppe rlimit on the master volume factor. Can be read and written simultaneously by different threads. Must be used atomically. */
     ma_duplex_rb duplexRB;                      /* Intermediary buffer for duplex device on asynchronous backends. */
     struct
     {
@@ -9290,11 +9289,8 @@ MA_API ma_result ma_device_post_init(ma_device* pDevice, ma_device_type deviceTy
 /*
 Sets the master volume factor for the device.
 
-The volume factor must be between 0 (silence) and the volume factor limit. Use `ma_device_set_master_volume_db()` to use decibel notation, where 0 is full volume and values less than 0 decreases the volume.
-
-Values greater than 1 (if allowed by the volume factor limit) will increase the volume of the audio stream. This may cause distortion when audio samples become too large.
-
-TODO: Apply clipping when the master volume factor exceeds 1 (and is allowed to do so by the master volume factor limit). This will reduce the distortion.
+The volume factor must be between 0 (silence) and 1 (full volume). Use `ma_device_set_master_volume_db()` to use decibel notation, where 0 is full volume and
+values less than 0 decreases the volume.
 
 
 Parameters
@@ -9348,7 +9344,7 @@ pDevice (in)
     A pointer to the device whose volume factor is being retrieved.
 
 pVolume (in)
-    A pointer to the variable that will receive the volume factor. The returned value will be in the range of [0, volume factor limit].
+    A pointer to the variable that will receive the volume factor. The returned value will be in the range of [0, 1].
 
 
 Return Value
@@ -18884,23 +18880,14 @@ static void ma_device__on_data(ma_device* pDevice, void* pFramesOut, const void*
 static void ma_device__handle_data_callback(ma_device* pDevice, void* pFramesOut, const void* pFramesIn, ma_uint32 frameCount)
 {
     float masterVolumeFactor;
-    float masterVolumeFactorLimit;
 
     ma_device_get_master_volume(pDevice, &masterVolumeFactor);  /* Use ma_device_get_master_volume() to ensure the volume is loaded atomically. */
-    ma_device_get_master_volume_limit(pDevice, &masterVolumeFactorLimit);  /* Use ma_device_get_master_volume_limit() to ensure the volume limit is loaded atomically. */
-
-    if (masterVolumeFactor > masterVolumeFactorLimit) {
-        masterVolumeFactor = masterVolumeFactorLimit;
-	/* TODO: if masterVolumeFactor > 1 here, we ought to apply clipping below. */
-    }
 
     if (pDevice->onData) {
         unsigned int prevDenormalState = ma_device_disable_denormals(pDevice);
         {
-	  /* ***CMR* There was an error in the original code here, I think. */
             /* Volume control of input makes things a bit awkward because the input buffer is read-only. We'll need to use a temp buffer and loop in this case. */
-	  if (pFramesIn != NULL) {
-	    if (masterVolumeFactor != 1) {
+            if (pFramesIn != NULL && masterVolumeFactor < 1) {
                 ma_uint8 tempFramesIn[MA_DATA_CONVERTER_STACK_BUFFER_SIZE];
                 ma_uint32 bpfCapture  = ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels);
                 ma_uint32 bpfPlayback = ma_get_bytes_per_frame(pDevice->playback.format, pDevice->playback.channels);
@@ -18920,13 +18907,12 @@ static void ma_device__handle_data_callback(ma_device* pDevice, void* pFramesOut
             } else {
                 ma_device__on_data(pDevice, pFramesOut, pFramesIn, frameCount);
             }
-	  }
 
             /* Volume control and clipping for playback devices. */
             if (pFramesOut != NULL) {
-                if (masterVolumeFactor != 1) {
+                if (masterVolumeFactor < 1) {
                     if (pFramesIn == NULL) {    /* <-- In full-duplex situations, the volume will have been applied to the input samples before the data callback. Applying it again post-callback will incorrectly compound it. */
-		      ma_apply_volume_factor_pcm_frames(pFramesOut, frameCount, pDevice->playback.format, pDevice->playback.channels, masterVolumeFactor);
+                        ma_apply_volume_factor_pcm_frames(pFramesOut, frameCount, pDevice->playback.format, pDevice->playback.channels, masterVolumeFactor);
                     }
                 }
 
@@ -41813,7 +41799,6 @@ MA_API ma_result ma_device_init(ma_context* pContext, const ma_device_config* pC
     pDevice->noDisableDenormals          = pConfig->noDisableDenormals;
     pDevice->noFixedSizedCallback        = pConfig->noFixedSizedCallback;
     ma_atomic_float_set(&pDevice->masterVolumeFactor, 1);
-    ma_atomic_float_set(&pDevice->masterVolumeFactorLimit, 1);
 
     pDevice->type                        = pConfig->deviceType;
     pDevice->sampleRate                  = pConfig->sampleRate;
@@ -42566,36 +42551,6 @@ MA_API ma_result ma_device_get_master_volume(ma_device* pDevice, float* pVolume)
     return MA_SUCCESS;
 }
 
-MA_API ma_result ma_device_set_master_volume_db(ma_device* pDevice, float gainDB)
-{
-    if (gainDB > 0) {
-        return MA_INVALID_ARGS;
-    }
-
-    return ma_device_set_master_volume(pDevice, ma_volume_db_to_linear(gainDB));
-}
-
-MA_API ma_result ma_device_get_master_volume_db(ma_device* pDevice, float* pGainDB)
-{
-    float factor;
-    ma_result result;
-
-    if (pGainDB == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    result = ma_device_get_master_volume(pDevice, &factor);
-    if (result != MA_SUCCESS) {
-        *pGainDB = 0;
-        return result;
-    }
-
-    *pGainDB = ma_volume_linear_to_db(factor);
-
-    return MA_SUCCESS;
-}
-
-
 MA_API ma_result ma_device_set_master_volume_limit(ma_device* pDevice, float volumeLimit)
 {
     if (pDevice == NULL) {
@@ -42626,6 +42581,36 @@ MA_API ma_result ma_device_get_master_volume_limit(ma_device* pDevice, float* pV
 
     return MA_SUCCESS;
 }
+
+MA_API ma_result ma_device_set_master_volume_db(ma_device* pDevice, float gainDB)
+{
+    if (gainDB > 0) {
+        return MA_INVALID_ARGS;
+    }
+
+    return ma_device_set_master_volume(pDevice, ma_volume_db_to_linear(gainDB));
+}
+
+MA_API ma_result ma_device_get_master_volume_db(ma_device* pDevice, float* pGainDB)
+{
+    float factor;
+    ma_result result;
+
+    if (pGainDB == NULL) {
+        return MA_INVALID_ARGS;
+    }
+
+    result = ma_device_get_master_volume(pDevice, &factor);
+    if (result != MA_SUCCESS) {
+        *pGainDB = 0;
+        return result;
+    }
+
+    *pGainDB = ma_volume_linear_to_db(factor);
+
+    return MA_SUCCESS;
+}
+
 
 MA_API ma_result ma_device_handle_backend_data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
