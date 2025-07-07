@@ -162,11 +162,11 @@ class Playback:
             volume_limit: A value >= 0
         """
 
-        printf("set_volume_limit %f\n", volume_limit)
+        print("set_volume_limit %f" % volume_limit)
 
         self.__ma_attrs.playback_volume_limit = max(volume_limit, 0)
         if self.active:
-            printf("set_volume_limit: active\n")
+            print("set_volume_limit: active")
             self.__bind(lib.set_device_volume_limit(self.__ma_attrs))
     
     def loop_at_end(self, loops_at_end: bool) -> None:
